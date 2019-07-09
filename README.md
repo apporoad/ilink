@@ -6,4 +6,5 @@
 
 
 
-[![avatar](https://raw.githubusercontent.com/apporoad/ilink/master/docs/ilink.png "link to jpg")](https://raw.githubusercontent.com/apporoad/ilink/master/docs/ilink.png)  
+[![avatar](https://raw.githubusercontent.com/apporoad/ilink/master/docs/ilink_design.png "link to jpg")](https://raw.githubusercontent.com/apporoad/ilink/master/docs/ilink_design.png)  
+
