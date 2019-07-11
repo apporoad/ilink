@@ -1,0 +1,29 @@
+{
+  "name": "ilink.js",
+  "version": "1.0.0",
+  "description": "<div align=center><img src=\"https://raw.githubusercontent.com/apporoad/ilink/master/docs/ilink_logo.png\"/></div>",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/apporoad/ilink.git"
+  },
+  "keywords": [
+    "invoke",
+    "link"
+  ],
+  "author": "apporoad",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/apporoad/ilink/issues"
+  },
+  "homepage": "https://github.com/apporoad/ilink#readme",
+  "dependencies": {
+    "dproxy.js": "^1.0.0"
+  }
+}
