@@ -1,7 +1,7 @@
 var ilink = require("../index")
 
 
-ilink.unimplemented(module)
+ilink.reg(module,"implement")
 
 
 exports.hello=function(){}
