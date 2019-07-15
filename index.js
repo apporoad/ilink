@@ -1,5 +1,7 @@
 var SEARCH_SCOPE= require("./enum").searchScope
 const dproxy = require("dproxy.js")
+const util = require("./util")
+const debug = require('debug')('ilink')
 
 var defaultOptions = {
     filter : /.*/g,
@@ -10,6 +12,8 @@ var defaultOptions = {
     scopes : [],
     verbose : false
 }
+
+exports.SEARCH_SCOPE = SEARCH_SCOPE
 
 exports.reg = (yourModule,moduleName,options) =>{
     options = options || defaultOptions
@@ -38,10 +42,42 @@ exports.reg = (yourModule,moduleName,options) =>{
 exports.inject = exports.reg
 
 
-exports.getRightIlinkImplement = (unimplementFilePath,options)=>{
+exports.getRightIlinkImplement = (unimplementFilePath,moduleName,options)=>{
 
 
 
 }
 
-exports.getSearchScope =()=>{}
+exports.getSearchScope =(unimplementFilePath,options)=>{
+    var searchScope = options.searchScope  ||  SEARCH_SCOPE.default
+    if(searchScope == SEARCH_SCOPE.custom)
+    {
+        if(options.scopes && options.scopes.length > 0)
+            return options.scopes
+        return []
+    }
+    //todo global and all
+    var scopes = []
+    //env
+    if(process.env.ILINK_SCOPES){
+        var env_scopes = ILINK_SCOPES.split(",|，|\\||:")
+        env_scopes.forEach(es => {
+            if(es && util.trim(es)){
+                
+                debug("add env ilink scope :" , util.trim(es))
+            }
+        });
+    }
+    //params
+    if(options.scopes && options.scopes.length>0){
+        options.scopes.forEach(es =>{
+            if(es && util.trim(es)){
+                scopes.push(util.trim(es))
+            }
+        })
+    }
+    //default
+    var topPath = util.getTopScanPath(unimplementFilePath)
+    if(topPath)
+        scopes.push(topPath)
+}

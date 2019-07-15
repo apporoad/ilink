@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/apporoad/ilink#readme",
   "dependencies": {
+    "debug": "^4.1.1",
     "dproxy.js": "^1.0.0"
   }
 }
