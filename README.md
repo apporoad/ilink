@@ -75,3 +75,6 @@ export ILINK_SCOPES=/s1,/s2
 export ILINK_CACHE_PATH=/cache
 
 ```
+
+
+more demo @ ilinkDemos.zip , you shall unzip it

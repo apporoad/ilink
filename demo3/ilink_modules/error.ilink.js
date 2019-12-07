@@ -1,4 +1,0 @@
-asd
-fdatasyncSyncf
-deepStrictEqualfsd
-f
