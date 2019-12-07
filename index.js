@@ -83,8 +83,8 @@ exports.getRightIlinkImplement = (unimplementFilePath,moduleName,options)=>{
 exports.getIlinkListByCache=(unimplementFilePath,options)=>{
     options = options || {}
 
-    // 1. get scops
-    var scopes = exports.getSearchScope(unimplementFilePath,options)
+    // 1. get scops  get scopes only needed
+    var scopes = null //exports.getSearchScope(unimplementFilePath,options)
     // 2. get ilink.cache.json
     var cachePath = path.join(process.env.ILINK_CACHE_PATH || path.dirname(unimplementFilePath),'ilink.cache.json')
     debug('ilink cache path:', cachePath)
@@ -96,6 +96,7 @@ exports.getIlinkListByCache=(unimplementFilePath,options)=>{
         var vp = options.validPeriod || defaultValidPeriod
         // 3. check ValidPeriod
         if(ilink.cacheTime && (Date.now() - ilink.cacheTime < vp )){
+            scopes = exports.getSearchScope(unimplementFilePath,options)
             // check scopes
             if(!lisaUtils.ArrayEquals(scopes,ilink.scopes)){
                 console.log('ilink: scopes updates,plz keep scopes stable!')
@@ -109,6 +110,8 @@ exports.getIlinkListByCache=(unimplementFilePath,options)=>{
         }
     }
     if(!ilink){
+        if(!scopes)
+            scopes = exports.getSearchScope(unimplementFilePath,options)
         ilink = exports.getIlinkList(scopes)
         fs.writeFileSync(cachePath,JSON.stringify(ilink))
 
