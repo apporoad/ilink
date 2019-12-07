@@ -22,6 +22,10 @@ set DEBUG=*,-not_this
 
 env_scopes
 ```bash
-set ILINK_SCOPES=/s1,/s2
+# 设置 ilink 搜索 scopes
+export ILINK_SCOPES=/s1,/s2
+
+# 设置 ilink cache path
+export ILINK_CACHE_PATH=/cache
 
 ```

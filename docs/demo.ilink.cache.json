@@ -4,7 +4,8 @@
     "ilinks":{
         "module1": [{
             "mainPath":"your enter file path",
-            "version":"your version"
+            "version":"your version",
+            "src": "your file source"
         }]
     }
 }

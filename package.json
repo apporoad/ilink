@@ -25,6 +25,9 @@
   "homepage": "https://github.com/apporoad/ilink#readme",
   "dependencies": {
     "debug": "^4.1.1",
-    "dproxy.js": "^1.0.0"
+    "dproxy.js": "^1.0.0",
+    "find": "^0.3.0",
+    "lisa.promise": "^1.1.1",
+    "lisa.utils": "^1.1.0"
   }
 }
