@@ -34,156 +34,141 @@ exports.reg = (yourModule,moduleName,options) =>{
     //yourModule.filename
     //"e:\workspace\ilink\demo1\unimplement.js"
     
-    exports.getRightIlinkImplement(yourModule.filename,moduleName,options).then(ilink=>{
-        if(ilink){
-            try
-            {
-                var js = require(ilink.mainPath)
-                Object.defineProperty(yourModule, 'loaded', {
-                    get: function() {
-                        return loaded;
-                    },
-                    set: function(value) {
-                        //console.log(yourModule.exports)
-                        if(value){
-                            //console.log(yourModule.id + ' loaded: ' + value);
-                            //here load complete //and set proxy
-                            dproxy.setProxy(yourModule.exports,js)
-                        }
+    var ilink = exports.getRightIlinkImplement(yourModule.filename,moduleName,options)
+    if(ilink){
+        try
+        {
+            var js = require(ilink.mainPath)
+            Object.defineProperty(yourModule, 'loaded', {
+                get: function() {
+                    return loaded;
+                },
+                set: function(value) {
+                    //console.log(yourModule.exports)
+                    if(value){
+                        //console.log(yourModule.id + ' loaded: ' + value);
+                        //here load complete //and set proxy
+                        dproxy.setProxy(yourModule.exports,js)
                     }
-                })
-            }catch(e){
-                console.log('ilink load module failed:' + ilink.src + ' [err]:' + e)
-            }
+                }
+            })
+        }catch(e){
+            console.log('ilink load module failed:' + ilink.src + ' [err]:' + e)
         }
-        else{
-            console.log('ilink cant find your implement:'+moduleName)
-        }
-    })
+    }
+    else{
+        console.log('ilink cant find your implement:'+moduleName)
+    }
+    
 }
 
 exports.inject = exports.reg
 
 
 exports.getRightIlinkImplement = (unimplementFilePath,moduleName,options)=>{
-    return exports.getIlinkListByCache(unimplementFilePath,options).then(ilink=>{
-        return new Promise((r,j)=>{
-            var mn = moduleName || 'default'
-            if(ilink.ilinks[mn]){
-                ilink.ilinks[mn].sort((a,b)=>{
-                    return a.version < b.version
-                })
-                r(ilink.ilinks[mn][0])
-            }
-            else{
-                r()
-            }
+    var ilink =exports.getIlinkListByCache(unimplementFilePath,options) 
+    var mn = moduleName || 'default'
+    if(ilink.ilinks[mn]){
+        ilink.ilinks[mn].sort((a,b)=>{
+            return a.version < b.version
         })
-    })
+        return ilink.ilinks[mn][0]
+    }
+    else{
+        return 
+    }
 }
 
 
 exports.getIlinkListByCache=(unimplementFilePath,options)=>{
     options = options || {}
-    return new Promise((r,j)=>{
-        // 1. get scops
-        var scopes = exports.getSearchScope(unimplementFilePath,options)
-        // 2. get ilink.cache.json
-        var cachePath = path.join(process.env.ILINK_CACHE_PATH || path.dirname(unimplementFilePath),'ilink.cache.json')
-        debug('ilink cache path:', cachePath)
-        var ilink =null
-        if(fs.existsSync(cachePath)){
-            ilink = require(cachePath)
-        }
-        if(ilink){
-            var vp = options.validPeriod || defaultValidPeriod
-            // 3. check ValidPeriod
-            if(ilink.cacheTime && (Date.now() - ilink.cacheTime < vp )){
-                // check scopes
-                if(!lisaUtils.ArrayEquals(scopes,ilink.scopes)){
-                    console.log('ilink: scopes updates,plz keep scopes stable!')
-                    fs.unlinkSync(cachePath)
-                    ilink =null
-                }
-            }else{
-                //remove cache
-                ilink = null
+
+    // 1. get scops
+    var scopes = exports.getSearchScope(unimplementFilePath,options)
+    // 2. get ilink.cache.json
+    var cachePath = path.join(process.env.ILINK_CACHE_PATH || path.dirname(unimplementFilePath),'ilink.cache.json')
+    debug('ilink cache path:', cachePath)
+    var ilink =null
+    if(fs.existsSync(cachePath)){
+        ilink = require(cachePath)
+    }
+    if(ilink){
+        var vp = options.validPeriod || defaultValidPeriod
+        // 3. check ValidPeriod
+        if(ilink.cacheTime && (Date.now() - ilink.cacheTime < vp )){
+            // check scopes
+            if(!lisaUtils.ArrayEquals(scopes,ilink.scopes)){
+                console.log('ilink: scopes updates,plz keep scopes stable!')
                 fs.unlinkSync(cachePath)
+                ilink =null
             }
-        }
-        if(ilink){
-            r(ilink)
         }else{
-            exports.getIlinkList(scopes).then(ilink=>{
-                fs.writeFileSync(cachePath,JSON.stringify(ilink))
-                r(ilink)
-            })
+            //remove cache
+            ilink = null
+            fs.unlinkSync(cachePath)
         }
-    })
+    }
+    if(!ilink){
+        ilink = exports.getIlinkList(scopes)
+        fs.writeFileSync(cachePath,JSON.stringify(ilink))
+
+    }
+    return ilink
 }
 
 
 exports.getIlinkList=(scopes) =>{
-    return lpromise.assignBatch(s=>{
-        return new Promise((r,j)=>{
-            find.file(/\.ilink\.js$/, s, function(files) {
-                r(files)
-              }).error(j)
-        })
-    },scopes).assignBatch(s=>{
-        return new Promise((r,j)=>{
-            find.file('ilink.json',s,function(files){
-                r(files)
-            }).error(j)
-        })
-    },scopes).action().then(files=>{
-        /*
-        [ 'F:\\workspace\\ilink\\demo2\\ilink_modules\\hello.ilink.js',
-        'F:\\workspace\\ilink\\demo2\\ilink_modules\\world.ilink.js',
-        'F:\\workspace\\ilink\\demo2\\test\\abc.ilink.js' ]
-        [ 'F:\\workspace\\ilink\\demo2\\ilink.json',
-        'F:\\workspace\\ilink\\demo2\\test\\ilink.json' ]
-        */
-       var ilinkObject = {
-        cacheTime : Date.now(),
-        scopes : scopes,
-        ilinks:{}
-       }
-       files.forEach(fs1=>{
-           fs1.forEach(f=>{
-               var bn = path.basename(f)
-               if(bn==='ilink.json'){
-                /*{
-                    "name":"your moduleName",
-                    "moduleName":"your moduleName , prior to name",
-                    "main":"index.js(your enter js)",
-                    "version":"1.0.1(yourVersion)"
-                }*/
-                    var i = require(f)
-                    var mn = i.moduleName || i.name || 'default'
-                    if(!ilinkObject.ilinks[mn]){
-                        ilinkObject.ilinks[mn] =[]
-                    }
-                    ilinkObject.ilinks[mn].push({
-                        mainPath : path.resolve(path.dirname(f),(i.main|| 'index.js')),
-                        version : i.version || "1.0.0",
-                        src : f
-                     })
-               }else{
-                    var mn = bn.substr(0,bn.length-9)
-                    if(!ilinkObject.ilinks[mn]){
-                        ilinkObject.ilinks[mn] =[]
-                    }
-                    ilinkObject.ilinks[mn].push({
-                        mainPath : f,
-                        version : "1.0.0",
-                        src : f
-                     })
-               }
-           })
-       })
-       return new Promise((rr,jj)=>{rr(ilinkObject)})
+    var files=[]
+    scopes.forEach(s=>{
+        files.push(find.fileSync(/\.ilink\.js$/, s))
+        files.push(find.fileSync('ilink.json',s))
     })
+    /*
+    [ 'F:\\workspace\\ilink\\demo2\\ilink_modules\\hello.ilink.js',
+    'F:\\workspace\\ilink\\demo2\\ilink_modules\\world.ilink.js',
+    'F:\\workspace\\ilink\\demo2\\test\\abc.ilink.js' ]
+    [ 'F:\\workspace\\ilink\\demo2\\ilink.json',
+    'F:\\workspace\\ilink\\demo2\\test\\ilink.json' ]
+    */
+    var ilinkObject = {
+    cacheTime : Date.now(),
+    scopes : scopes,
+    ilinks:{}
+    }
+    files.forEach(fs1=>{
+        fs1.forEach(f=>{
+            var bn = path.basename(f)
+            if(bn==='ilink.json'){
+            /*{
+                "name":"your moduleName",
+                "moduleName":"your moduleName , prior to name",
+                "main":"index.js(your enter js)",
+                "version":"1.0.1(yourVersion)"
+            }*/
+                var i = require(f)
+                var mn = i.moduleName || i.name || 'default'
+                if(!ilinkObject.ilinks[mn]){
+                    ilinkObject.ilinks[mn] =[]
+                }
+                ilinkObject.ilinks[mn].push({
+                    mainPath : path.resolve(path.dirname(f),(i.main|| 'index.js')),
+                    version : i.version || "1.0.0",
+                    src : f
+                    })
+            }else{
+                var mn = bn.substr(0,bn.length-9)
+                if(!ilinkObject.ilinks[mn]){
+                    ilinkObject.ilinks[mn] =[]
+                }
+                ilinkObject.ilinks[mn].push({
+                    mainPath : f,
+                    version : "1.0.0",
+                    src : f
+                    })
+            }
+        })
+    })
+    return ilinkObject
 }
 
 exports.getSearchScope =(unimplementFilePath,options)=>{
