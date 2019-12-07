@@ -1,1 +1,10 @@
-{}
+{
+    "cacheTime":"your last cache Time",
+    "scopes":["sss"],
+    "ilinks":{
+        "module1": [{
+            "mainPath":"your enter file path",
+            "version":"your version"
+        }]
+    }
+}

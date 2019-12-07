@@ -2,6 +2,7 @@ var SEARCH_SCOPE= require("./enum").searchScope
 const dproxy = require("dproxy.js")
 const util = require("./util")
 const debug = require('debug')('ilink')
+const path = require('path')
 
 var defaultOptions = {
     filter : /.*/g,
@@ -21,6 +22,7 @@ exports.reg = (yourModule,moduleName,options) =>{
     if(!yourModule){
         throw Error("ilink:reg: your must input a module")
     }
+    debug('your reg moduleName:' + (moduleName||'nil'))
     //yourModule.filename
     //"e:\workspace\ilink\demo1\unimplement.js"
     
@@ -43,12 +45,20 @@ exports.inject = exports.reg
 
 
 exports.getRightIlinkImplement = (unimplementFilePath,moduleName,options)=>{
-
-
+    var paths = exports.getSearchScope(unimplementFilePath,options)
+    //todo
 
 }
 
+
+exports.getIlinkListByCache=(unimplementFilePath,options)=>{
+    // 1. get scops
+    
+    //todo
+}
+
 exports.getSearchScope =(unimplementFilePath,options)=>{
+    options = options || defaultOptions
     var searchScope = options.searchScope  ||  SEARCH_SCOPE.default
     if(searchScope == SEARCH_SCOPE.custom)
     {
@@ -56,15 +66,18 @@ exports.getSearchScope =(unimplementFilePath,options)=>{
             return options.scopes
         return []
     }
-    //todo global and all
+    else if(searchScope === SEARCH_SCOPE.all || searchScope=== SEARCH_SCOPE.global){
+        //todo global and all
+        console.log('your searchScope:' + searchScope + '  will be implemented in the future')
+    }
     var scopes = []
     //env
     if(process.env.ILINK_SCOPES){
-        var env_scopes = ILINK_SCOPES.split(",|，|\\||:")
+        var env_scopes = process.env.ILINK_SCOPES.split(/,|，|:/)
         env_scopes.forEach(es => {
             if(es && util.trim(es)){
-                
-                debug("add env ilink scope :" , util.trim(es))
+                debug("add env ilink scope :" ,es)
+                scopes.push(util.trim(es))
             }
         });
     }
@@ -80,4 +93,12 @@ exports.getSearchScope =(unimplementFilePath,options)=>{
     var topPath = util.getTopScanPath(unimplementFilePath)
     if(topPath)
         scopes.push(topPath)
+    var currentDir = path.dirname(unimplementFilePath)
+
+    // resole path
+    var rs= []
+    scopes.forEach(ele=>{
+        rs.push(path.resolve(currentDir,ele))
+    })
+    return rs
 }

@@ -1,0 +1,6 @@
+{
+    "name":"your moduleName",
+    "moduleName":"your moduleName , prior to name",
+    "main":"index.js(your enter js)",
+    "version":"1.0.1(yourVersion)"
+}
