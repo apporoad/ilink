@@ -36,6 +36,7 @@ exports.reg = (yourModule,moduleName,options) =>{
     
     var ilink = exports.getRightIlinkImplement(yourModule.filename,moduleName,options)
     if(ilink){
+        debug('your ilink is ' + ilink)
         try
         {
             var js = require(ilink.mainPath)
