@@ -5,7 +5,8 @@
         "module1": [{
             "mainPath":"your enter file path",
             "version":"your version",
-            "src": "your file source"
+            "src": "your file source",
+            "tags" : ["tag1"]
         }]
     }
 }

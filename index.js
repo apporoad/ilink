@@ -67,6 +67,7 @@ exports.inject = exports.reg
 
 
 exports.getRightIlinkImplement = (unimplementFilePath,moduleName,options)=>{
+
     var ilink =exports.getIlinkListByCache(unimplementFilePath,options) 
     var mn = moduleName || 'default'
     if(ilink.ilinks[mn]){
@@ -80,7 +81,40 @@ exports.getRightIlinkImplement = (unimplementFilePath,moduleName,options)=>{
     }
 }
 
-
+exports.getIlinkTags =(unimplementFilePath,moduleName)=>{
+    var ilinkConfigPath = path.join(process.env.ILINK_CACHE_PATH || path.dirname(unimplementFilePath),'ilink.config.json')
+    var ilinkConfig = null
+    if(fs.existsSync(ilinkConfigPath)){
+        ilinkConfig = require(ilinkConfigPath)
+    }
+    if(process.env.ILINK_TAGS){
+        //moduleName:tag1,tag2;moduleName2:tag3,tag4
+        ilinkConfig = ilinkConfig || {}
+        ilinkConfig.updateTime = Date.now()
+        ilinkConfig.selectTags = ilinkConfig.selectTags || {}
+        var isModified = false
+        process.env.ILINK_TAGS.split(';').forEach(moduleAndTag=>{
+            var ATArray = moduleAndTag.split(':')
+            if(ATArray.length==1){
+                // moduleName:   or  moduleName
+                if(ilinkConfig.selectTags[ATArray[0]]){
+                    ilinkConfig.selectTags[ATArray] = null
+                    isModified =true
+                }
+            }else{
+                // moduleName: tag1  or  moduleName:tag1,tag2
+                //todo
+            }
+        })
+    }
+    if(ilinkConfig && ilinkConfig.selectTags 
+        && ilinkConfig.selectTags[moduleName]
+        && ilinkConfig.selectTags[moduleName].length>0){
+        return ilinkConfig.selectTags[moduleName]
+    }else{
+        return null
+    }
+}
 exports.getIlinkListByCache=(unimplementFilePath,options)=>{
     options = options || {}
 
@@ -154,10 +188,18 @@ exports.getIlinkList=(scopes) =>{
                 if(!ilinkObject.ilinks[mn]){
                     ilinkObject.ilinks[mn] =[]
                 }
+                var tags = null
+                if(i.tag){
+                    tags= [i.tag]
+                }
+                if(i.tags){
+                    tags = (tags || []).concat(i.tags)
+                }
                 ilinkObject.ilinks[mn].push({
                     mainPath : path.resolve(path.dirname(f),(i.main|| 'index.js')),
                     version : i.version || "1.0.0",
-                    src : f
+                    src : f,
+                    tags : tags
                     })
             }else{
                 var mn = bn.substr(0,bn.length-9)
@@ -167,7 +209,8 @@ exports.getIlinkList=(scopes) =>{
                 ilinkObject.ilinks[mn].push({
                     mainPath : f,
                     version : "1.0.0",
-                    src : f
+                    src : f,
+                    tags : null
                     })
             }
         })

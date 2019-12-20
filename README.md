@@ -53,12 +53,17 @@ node test.js
     "name":"your moduleName",
     "moduleName":"your moduleName , prior to name",
     "main":"index.js(your enter js)",
-    "version":"1.0.1(yourVersion)"
+    "version":"1.0.1(yourVersion)",
+    "tag":"your tag , invoke use this to select implement",
+    "tags": [ "tag1","tag2 juset like tag"]
 }
 ```
 
+## recommended use
 
-
+[demo](https://github.com/apporoad/ilink.demo)
+[https://github.com/apporoad/demo.module1.v1.ilink]
+[https://github.com/apporoad/demo.module1.v2.ilink]
 
 ### 
 how to debug
@@ -68,12 +73,14 @@ set DEBUG=*,-not_this
 
 env_scopes
 ```bash
-# 设置 ilink 搜索 scopes
+# 设置 ilink 搜索 scopes， 默认还包含 unimplement.js所在node项目中
 export ILINK_SCOPES=/s1,/s2
 
-# 设置 ilink cache path
+# 设置 ilink cache path  默认存放在unimplement.js所在文件夹
 export ILINK_CACHE_PATH=/cache
 
+# 设置 ilink 选择tag ,指定调用的模块优先选择对应的实现
+export ILINK_TAGS="moduleName:tag1,tag2;moduleName2:tag3,tag4"
 ```
 
 

@@ -1,0 +1,7 @@
+{
+    "updateTime":"your last op time",
+    "selectTags" :{
+        "moduleName1" : ["tag1","tag2","tag3"]
+    }
+
+}
