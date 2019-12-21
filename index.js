@@ -114,7 +114,7 @@ var getIlinkTempDir = (unimplementFilePath)=>{
     if(!fs.existsSync(ilinkTempDir)){
         fs.mkdirSync(ilinkTempDir)
     }
-    console.log(ilinkTempDir)
+    // console.log(ilinkTempDir)
     return ilinkTempDir
 }
 
