@@ -1,6 +1,6 @@
 {
   "name": "ilink.js",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "<div align=center><img src=\"https://raw.githubusercontent.com/apporoad/ilink/master/docs/ilink_logo.png\"/></div>",
   "main": "index.js",
   "directories": {
@@ -27,6 +27,7 @@
     "debug": "^4.1.1",
     "dproxy.js": "^1.0.0",
     "find": "^0.3.0",
+    "hash-sum": "^2.0.0",
     "lisa.utils": "^1.1.0"
   }
 }

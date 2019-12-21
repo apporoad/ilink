@@ -74,7 +74,7 @@ env_scopes
 # 设置 ilink 搜索 scopes， 默认还包含 unimplement.js所在node项目中
 export ILINK_SCOPES=/s1,/s2
 
-# 设置 ilink cache path  默认存放在unimplement.js所在文件夹
+# 设置 ilink cache path  默认存放在/tmp/ilink/ (windows有所区别)
 export ILINK_CACHE_PATH=/cache
 
 # 设置 ilink 选择tag ,指定调用的模块优先选择对应的实现

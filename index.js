@@ -6,6 +6,8 @@ const path = require('path')
 const find = require('find')
 const fs = require('fs')
 const lisaUtils = require('lisa.utils')
+const os = require('os')
+const hash= require('hash-sum')
 
 //todo
 const defaultValidPeriod = 60000
@@ -101,8 +103,23 @@ exports.getRightIlinkImplement = (unimplementFilePath,moduleName,options)=>{
     }
 }
 
+var getIlinkTempDir = (unimplementFilePath)=>{
+    if(!process.env.ILINK_CACHE_PATH)
+    {
+        if(!fs.existsSync(os.tmpdir() + '/ilink')){
+            fs.mkdirSync(os.tmpdir() + '/ilink')
+        }
+    }
+    var ilinkTempDir = path.join(process.env.ILINK_CACHE_PATH || os.tmpdir() + '/ilink', hash(unimplementFilePath))
+    if(!fs.existsSync(ilinkTempDir)){
+        fs.mkdirSync(ilinkTempDir)
+    }
+    console.log(ilinkTempDir)
+    return ilinkTempDir
+}
+
 exports.getIlinkTags =(unimplementFilePath,moduleName)=>{
-    var ilinkConfigPath = path.join(process.env.ILINK_CACHE_PATH || path.dirname(unimplementFilePath),'ilink.config.json')
+    var ilinkConfigPath = path.join( getIlinkTempDir(unimplementFilePath),'ilink.config.json')
     var ilinkConfig = null
     if(fs.existsSync(ilinkConfigPath)){
         ilinkConfig = require(ilinkConfigPath)
@@ -157,7 +174,7 @@ exports.getIlinkListByCache=(unimplementFilePath,options)=>{
     // 1. get scops  get scopes only needed
     var scopes = null //exports.getSearchScope(unimplementFilePath,options)
     // 2. get ilink.cache.json
-    var cachePath = path.join(process.env.ILINK_CACHE_PATH || path.dirname(unimplementFilePath),'ilink.cache.json')
+    var cachePath = path.join(getIlinkTempDir(unimplementFilePath),'ilink.cache.json')
     debug('ilink cache path:', cachePath)
     var ilink =null
     if(fs.existsSync(cachePath)){
