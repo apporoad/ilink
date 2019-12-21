@@ -5,7 +5,6 @@ const debug = require('debug')('ilink')
 const path = require('path')
 const find = require('find')
 const fs = require('fs')
-const lpromise = require('lisa.promise')()
 const lisaUtils = require('lisa.utils')
 
 //todo
@@ -67,14 +66,35 @@ exports.inject = exports.reg
 
 
 exports.getRightIlinkImplement = (unimplementFilePath,moduleName,options)=>{
-
+    var tags = exports.getIlinkTags(unimplementFilePath,moduleName)
     var ilink =exports.getIlinkListByCache(unimplementFilePath,options) 
     var mn = moduleName || 'default'
     if(ilink.ilinks[mn]){
-        ilink.ilinks[mn].sort((a,b)=>{
-            return a.version < b.version
-        })
-        return ilink.ilinks[mn][0]
+        var mnLinks = ilink.ilinks[mn]
+        if(tags && tags.length>0){
+            var rlinks = []
+            for(var i=0 ;i<tags.length;i++){
+                for(var j =0 ;j<mnLinks.length ;j++){
+                    if(mnLinks[j].tags && lisaUtils.ArrayContains(mnLinks[j].tags,tags[i])){
+                        rlinks.push(mnLinks[j])
+                    }
+                }
+            }
+            //console.log(rlinks)
+            if(rlinks.length == 0) {
+                throw Error('ilink taged : ' + tags + ' implemented cannot be found!')
+            }
+            rlinks.sort((a,b)=>{
+                return a.version < b.version
+            })
+            return rlinks[0]
+        }
+        else{
+            ilink.ilinks[mn].sort((a,b)=>{
+                return a.version < b.version
+            })
+            return ilink.ilinks[mn][0]
+        }
     }
     else{
         return 
@@ -98,14 +118,30 @@ exports.getIlinkTags =(unimplementFilePath,moduleName)=>{
             if(ATArray.length==1){
                 // moduleName:   or  moduleName
                 if(ilinkConfig.selectTags[ATArray[0]]){
-                    ilinkConfig.selectTags[ATArray] = null
+                    ilinkConfig.selectTags[ATArray[0]] = null
                     isModified =true
                 }
             }else{
                 // moduleName: tag1  or  moduleName:tag1,tag2
-                //todo
+                var ts = ATArray[1].split(',')
+                var rts = []
+                ts.forEach(t=>{ rts.push(t)})
+                
+                if(ilinkConfig.selectTags[ATArray[0]] && lisaUtils.ArrayEquals(ilinkConfig.selectTags[ATArray[0]],
+                    rts)){
+                        //do nothing
+                }
+                else{
+                    ilinkConfig.selectTags[ATArray[0]] = rts
+                    isModified = true
+                }
+                //ilinkConfig.selectTags[ATArray[0]]
             }
         })
+        if(isModified){
+            // write to file
+            fs.writeFileSync(ilinkConfigPath,JSON.stringify(ilinkConfig))
+        }
     }
     if(ilinkConfig && ilinkConfig.selectTags 
         && ilinkConfig.selectTags[moduleName]

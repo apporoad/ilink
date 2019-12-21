@@ -62,8 +62,6 @@ node test.js
 ## recommended use
 
 [demo](https://github.com/apporoad/ilink.demo)
-[https://github.com/apporoad/demo.module1.v1.ilink]
-[https://github.com/apporoad/demo.module1.v2.ilink]
 
 ### 
 how to debug
