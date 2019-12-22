@@ -83,3 +83,7 @@ export ILINK_TAGS="moduleName:tag1,tag2;moduleName2:tag3,tag4"
 
 
 more demo @ ilinkDemos.zip , you shall unzip it
+
+## tips
+if you use tags， you shall set ILINK_CACHE_PATH , /tmp is not safe    
+如果需要使用tag指定实现，那么强烈建议设置ILINK_CACHE_PATH， 因为系统临时文件夹是不可靠的，这个在生产环境尤为重要
