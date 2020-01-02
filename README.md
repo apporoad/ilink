@@ -9,6 +9,9 @@
 [![avatar](https://raw.githubusercontent.com/apporoad/ilink/master/docs/ilink_design.png "link to jpg")](https://raw.githubusercontent.com/apporoad/ilink/master/docs/ilink_design.png)  
 
 
+## phil(哲学)
+
+[phil](./phil.md)
 
 ## how to use
 ```bash
