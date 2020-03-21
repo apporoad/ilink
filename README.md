@@ -6,7 +6,7 @@
 
 
 
-[![avatar](https://raw.githubusercontent.com/apporoad/ilink/master/docs/ilink_design.png "link to jpg")](https://raw.githubusercontent.com/apporoad/ilink/master/docs/ilink_design.png)  
+[![avatar](https://raw.githubusercontent.com/apporoad/designs/master/ilink_design.png "link to jpg")](https://raw.githubusercontent.com/apporoad/designs/master/ilink_design.png)  
 
 
 ## phil(哲学)
@@ -21,7 +21,8 @@ npm i --save ilink.js
 vim unimplement.js
 ```
 ```js
-require("ilink.js").reg(module,"yourModuleName")
+var options = {}
+require("ilink.js").reg(module,"yourModuleName",options)
 exports.hello=function(){}
 exports.good = "good"
 ```
@@ -65,6 +66,21 @@ node test.js
 ## recommended use
 
 [demo](https://github.com/apporoad/ilink.demo)
+
+## options
+```js
+{
+    searchScope : 1,
+    scopes : [],
+    verbose : false,
+    validPeriod : 60000 * 60
+}
+
+```
+1. searchScope ： 查询实现的模式 默认为1  ， 自定义采用4
+2. scopes ： ilink实现所在的路径，数组表示多个， 只有当searchScope为4时有效
+3. verbose ： 是否展示详细提示信息
+4. validPeriod : ilink验证间隔，默认1小时，根据实际项目状况选择，该时间决定ilink的缓存时间，这段时间内不会重复扫描ilink实现
 
 ### 
 how to debug

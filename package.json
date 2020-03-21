@@ -1,6 +1,6 @@
 {
   "name": "ilink.js",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "<div align=center><img src=\"https://raw.githubusercontent.com/apporoad/ilink/master/docs/ilink_logo.png\"/></div>",
   "main": "index.js",
   "directories": {

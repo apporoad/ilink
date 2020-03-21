@@ -26,7 +26,8 @@ var defaultOptions = {
 exports.SEARCH_SCOPE = SEARCH_SCOPE
 
 exports.reg = (yourModule,moduleName,options) =>{
-    options = options || defaultOptions
+    options =  options ||  {} 
+    options = Object.assign({},defaultOptions,options)
 
     if(!yourModule){
         throw Error("ilink:reg: your must input a module")
