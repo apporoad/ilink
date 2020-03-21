@@ -10,7 +10,7 @@ const os = require('os')
 const hash= require('hash-sum')
 
 //todo
-const defaultValidPeriod = 60000
+const defaultValidPeriod = 60000 * 60
 
 var defaultOptions = {
     filter : /.*/g,
@@ -20,7 +20,7 @@ var defaultOptions = {
     searchScope : SEARCH_SCOPE.default,
     scopes : [],
     verbose : false,
-    validPeriod : 60000
+    validPeriod : defaultValidPeriod
 }
 
 exports.SEARCH_SCOPE = SEARCH_SCOPE
@@ -187,7 +187,7 @@ exports.getIlinkListByCache=(unimplementFilePath,options)=>{
             scopes = exports.getSearchScope(unimplementFilePath,options)
             // check scopes
             if(!lisaUtils.ArrayEquals(scopes,ilink.scopes)){
-                console.log('ilink: scopes updates,plz keep scopes stable!')
+                debug('ilink: scopes updates,plz keep scopes stable!')
                 fs.unlinkSync(cachePath)
                 ilink =null
             }
@@ -209,11 +209,6 @@ exports.getIlinkListByCache=(unimplementFilePath,options)=>{
 
 
 exports.getIlinkList=(scopes) =>{
-    var files=[]
-    scopes.forEach(s=>{
-        files.push(find.fileSync(/\.ilink\.js$/, s))
-        files.push(find.fileSync('ilink.json',s))
-    })
     /*
     [ 'F:\\workspace\\ilink\\demo2\\ilink_modules\\hello.ilink.js',
     'F:\\workspace\\ilink\\demo2\\ilink_modules\\world.ilink.js',
@@ -226,6 +221,21 @@ exports.getIlinkList=(scopes) =>{
     scopes : scopes,
     ilinks:{}
     }
+
+    //ilink ignore
+    if(lisaUtils.ArrayContains(process.argv,'',(b,a)=>{
+        return a && (a.toLowerCase() == '--ilinkignore' || a.toLowerCase() == "--ilinknosearch")
+     })){
+         return ilinkObject
+     }
+    console.log('ilink starting search scopes ... \r\n' +
+    '(if you do not wanna ilink,plz add [--ilinkignore] or [--ilinknosearch] when start your app)') 
+    var files=[]
+    scopes.forEach(s=>{
+        files.push(find.fileSync(/\.ilink\.js$/, s))
+        files.push(find.fileSync('ilink.json',s))
+    })
+
     files.forEach(fs1=>{
         fs1.forEach(f=>{
             var bn = path.basename(f)

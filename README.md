@@ -89,4 +89,6 @@ more demo @ ilinkDemos.zip , you shall unzip it
 
 ## tips
 if you use tags， you shall set ILINK_CACHE_PATH , /tmp is not safe    
-如果需要使用tag指定实现，那么强烈建议设置ILINK_CACHE_PATH， 因为系统临时文件夹是不可靠的，这个在生产环境尤为重要
+如果需要使用tag指定实现，那么强烈建议设置ILINK_CACHE_PATH， 因为系统临时文件夹是不可靠的，这个在生产环境尤为重要   
+
+如果不采用ilink，采用默认实现，启动参数请加上 --ilinkignore
