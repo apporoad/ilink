@@ -73,18 +73,24 @@ node test.js
     searchScope : 1,
     scopes : [],
     verbose : false,
-    validPeriod : 60000 * 60
+    validPeriod : 60000 * 60,
+    timeout : 2000
 }
 
 ```
 1. searchScope ： 查询实现的模式 默认为1  ， 自定义采用4
-2. scopes ： ilink实现所在的路径，数组表示多个， 只有当searchScope为4时有效
+默认的搜索逻辑为： 加载环境变量ILINK_SCOPES 定义的目录,多目录时可以以 , 或者:隔开  
+同时加载未实现文件所在项目的所有子目录，故如果外部项目需要全局安装的话，搜索效率会非常低
+2. scopes ： ilink实现所在的路径，数组表示多个， 只有当searchScope为4时有效  
+非常重要，如果外部用户不希望采用ilink默认的搜索方式，请采用这种方式集成
 3. verbose ： 是否展示详细提示信息
 4. validPeriod : ilink验证间隔，默认1小时，根据实际项目状况选择，该时间决定ilink的缓存时间，这段时间内不会重复扫描ilink实现
+5. timeout : 搜索scope的时间，如果超过，自动停止搜索
 
 ### 
 how to debug
 ```bash
+npm i debug
 set DEBUG=*,-not_this
 ```
 

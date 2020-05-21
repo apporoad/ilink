@@ -1,13 +1,23 @@
 var SEARCH_SCOPE= require("./enum").searchScope
 const dproxy = require("dproxy.js")
 const util = require("./util")
-const debug = require('debug')('ilink')
+const debuger = null 
 const path = require('path')
 const find = require('find')
 const fs = require('fs')
 const lisaUtils = require('lisa.utils')
 const os = require('os')
 const hash= require('hash-sum')
+
+try{
+ debuger = require('debug')('ilink')
+}catch(e){}
+
+const debug = p =>{
+    if(debuger){
+        debuger(p)
+    }
+}
 
 //todo
 const defaultValidPeriod = 60000 * 60
@@ -20,7 +30,8 @@ var defaultOptions = {
     searchScope : SEARCH_SCOPE.default,
     scopes : [],
     verbose : false,
-    validPeriod : defaultValidPeriod
+    validPeriod : defaultValidPeriod,
+    timeout : 2*1000
 }
 
 exports.SEARCH_SCOPE = SEARCH_SCOPE
@@ -201,7 +212,7 @@ exports.getIlinkListByCache=(unimplementFilePath,options)=>{
     if(!ilink){
         if(!scopes)
             scopes = exports.getSearchScope(unimplementFilePath,options)
-        ilink = exports.getIlinkList(scopes)
+        ilink = exports.getIlinkList(scopes,options)
         fs.writeFileSync(cachePath,JSON.stringify(ilink))
 
     }
@@ -209,7 +220,7 @@ exports.getIlinkListByCache=(unimplementFilePath,options)=>{
 }
 
 
-exports.getIlinkList=(scopes) =>{
+exports.getIlinkList=(scopes, options) =>{
     /*
     [ 'F:\\workspace\\ilink\\demo2\\ilink_modules\\hello.ilink.js',
     'F:\\workspace\\ilink\\demo2\\ilink_modules\\world.ilink.js',
@@ -222,6 +233,8 @@ exports.getIlinkList=(scopes) =>{
     scopes : scopes,
     ilinks:{}
     }
+    options = options || {}
+    options.timeout = options.timeout || 2000
 
     //ilink ignore
     if(lisaUtils.ArrayContains(process.argv,'',(b,a)=>{
@@ -232,11 +245,16 @@ exports.getIlinkList=(scopes) =>{
     console.log('ilink starting search scopes ... \r\n' +
     '(if you do not wanna ilink,plz add [--ilinkignore] or [--ilinknosearch] when start your app)') 
     var files=[]
-    scopes.forEach(s=>{
+    var tp = Date.now()
+    for(var i =0 ;i<scopes.length;i++){
+        var s = scopes[i]
+        if(Date.now() -tp > options.timeout){
+            console.log('search timeout, only ' + i + ' scopes searched')
+            break
+        }
         files.push(find.fileSync(/\.ilink\.js$/, s))
         files.push(find.fileSync('ilink.json',s))
-    })
-
+    }
     files.forEach(fs1=>{
         fs1.forEach(f=>{
             var bn = path.basename(f)
